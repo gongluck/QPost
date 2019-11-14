@@ -7,15 +7,19 @@ Window {
     width: 640
     height: 480
     title: qsTr("QPost")
+    color: "black"
+
+    signal postrequest(string uri, string header, string body);
 
     Column {
-        width: parent.width
-        height: parent.height
-        spacing: 10
+        anchors.fill: parent
+        spacing: 5
+
         Rectangle {
             width: parent.width
-            height: 30
+            height: parent.height/15
             color: "yellow"
+
             Text {
                 id: texturi
                 text: "URI:"
@@ -23,42 +27,114 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
             }
             TextInput {
-                text: "please in put "
-                anchors.left: texturi.right
+                id: uri
+                text: "please in put uri"
+                cursorVisible: true
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.left: texturi.right
+                anchors.right: post.left
             }
             Button {
-                focus: true
+                id: post
                 text: "Post"
                 width: 50
-                height: 30
+                height: parent.height
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-
+                onClicked: {
+                    console.log("Post clicked ", uri.text, header.text, body.text);
+                    postrequest(uri.text, header.text, body.text)
+                }
             }
         }
+
         Rectangle {
             width: parent.width
-            height: 60
+            height: parent.height/5
             color: "green"
+
             Text {
                 id: textheader
                 text: "header:"
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
             }
-            TextArea {
+            ScrollView {
                 height: parent.height
-                text: "input header "
+                width: parent.width - textheader.width
                 anchors.left: textheader.right
                 anchors.verticalCenter: parent.verticalCenter
+                TextArea {
+                    id: header
+                    text: "please input header"
+                }
             }
         }
-        TextEdit {
-            text: "body"
+
+        Rectangle {
+            width: parent.width
+            height: parent.height/4
+            color: "blue"
+            Text {
+                id: textbody
+                text: "body:"
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            ScrollView {
+                width: parent.width - textbody.width
+                height: parent.height
+                anchors.left: textbody.right
+                anchors.verticalCenter: parent.verticalCenter
+                TextArea {
+                    id: body
+                    text: "please input body"
+                }
+            }
         }
-        TextEdit {
-            text: "reponse"
+
+        Rectangle {
+            width: parent.width
+            height: parent.height/5
+            color: "grey"
+            Text {
+                id: textreponseheader
+                text: "reponse header:"
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            ScrollView {
+                width: parent.width - textreponseheader.width
+                height: parent.height
+                anchors.left: textreponseheader.right
+                anchors.verticalCenter: parent.verticalCenter
+                TextArea {
+                    readOnly: true
+                    text: "the reponseheader"
+                }
+            }
+        }
+
+        Rectangle {
+            width: parent.width
+            height: parent.height/4
+            color: "red"
+            Text {
+                id: textreponse
+                text: "reponse:"
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            ScrollView {
+                width: parent.width - textreponse.width
+                height: parent.height
+                anchors.left: textreponse.right
+                anchors.verticalCenter: parent.verticalCenter
+                TextArea {
+                    readOnly: true
+                    text: "the reponse"
+                }
+            }
         }
     }
 }
