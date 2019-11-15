@@ -9,7 +9,57 @@ Window {
     title: qsTr("QPost")
     color: "black"
 
-    signal postrequest(string uri, string header, string body);
+    //signal postrequest(string uri, string header, string body);
+    //signal gotreponse(string header, string body);
+
+    function	request()
+    {
+        var xhr	= new XMLHttpRequest();
+        function setstatustext() {
+            status.text = "TIMEOUT OR ERROR ";
+            status.text += xhr.status;
+        }
+        xhr.onreadystatechange	=	function()	{
+            if	(xhr.readyState 	===	XMLHttpRequest.HEADERS_RECEIVED)	{
+                status.text = "SENDED";
+            }	else	if (xhr.readyState === xhr.DONE) {
+                status.text = xhr.statusText;
+                reponseheader.text = xhr.getAllResponseHeaders();
+                reponse.text = xhr.response;
+            }
+        }
+        xhr.ontimeout = setstatustext;
+        xhr.onerror = setstatustext;
+
+        if(body.text == "")
+        {
+            xhr.open("GET", uri.text);
+        }
+        else
+        {
+            xhr.open("POST",	uri.text);
+        }
+
+        if(header.text != "")
+        {
+            var headers = header.text;
+            var words = headers.split("\n");
+            for(var i = 0; i<words.length; ++i)
+            {
+                var ky = words[i].split(":");
+                xhr.setRequestHeader(ky[0], ky[1]);
+            }
+        }
+
+        if(body.text == "")
+        {
+            xhr.send();
+        }
+        else
+        {
+            xhr.send(body.text);
+        }
+    }
 
     Column {
         anchors.fill: parent
@@ -28,11 +78,11 @@ Window {
             }
             TextInput {
                 id: uri
-                text: "please in put uri"
-                cursorVisible: true
+                text: "http://www.example.com"
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: texturi.right
                 anchors.right: post.left
+                selectByMouse: true
             }
             Button {
                 id: post
@@ -42,8 +92,11 @@ Window {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: {
-                    console.log("Post clicked ", uri.text, header.text, body.text);
-                    postrequest(uri.text, header.text, body.text)
+                    reponseheader.text = ""
+                    reponse.text = ""
+                    status.text = "READY";
+                    //postrequest(uri.text, header.text, body.text);
+                    request();
                 }
             }
         }
@@ -66,7 +119,8 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
                 TextArea {
                     id: header
-                    text: "please input header"
+                    text: ""
+                    selectByMouse: true
                 }
             }
         }
@@ -88,9 +142,15 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
                 TextArea {
                     id: body
-                    text: "please input body"
+                    text: ""
+                    selectByMouse: true
                 }
             }
+        }
+
+        Text {
+            id: status
+            color: "white"
         }
 
         Rectangle {
@@ -109,8 +169,10 @@ Window {
                 anchors.left: textreponseheader.right
                 anchors.verticalCenter: parent.verticalCenter
                 TextArea {
+                    id: reponseheader
                     readOnly: true
-                    text: "the reponseheader"
+                    text: ""
+                    selectByMouse: true
                 }
             }
         }
@@ -131,8 +193,10 @@ Window {
                 anchors.left: textreponse.right
                 anchors.verticalCenter: parent.verticalCenter
                 TextArea {
+                    id: reponse
                     readOnly: true
-                    text: "the reponse"
+                    text: ""
+                    selectByMouse: true
                 }
             }
         }
